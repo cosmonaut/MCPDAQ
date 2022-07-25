@@ -71,8 +71,12 @@ void MCPDAQColorGradient::set_preset(MCPGradPreset preset)
         }
         break;
     case cubehelix:
-        // NOT YET IMPLEMENTED
-        loadPreset(QCPColorGradient::gpGrayscale);
+        setColorInterpolation(ciRGB);
+        for (i = 0; i < 256; i++) {
+            f = i/255.0;
+            const QColor color = tinycolormap::GetColor(f, tinycolormap::ColormapType::Cubehelix).ConvertToQColor();
+            setColorStopAt(f, color);
+        }
         break;
     case gpGrayscale:
         loadPreset(QCPColorGradient::gpGrayscale);

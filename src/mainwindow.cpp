@@ -11,6 +11,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->statusbar->showMessage("OH HI, MARK");
 
+    // Display plot data on status bar.
+    connect(ui->widget, SIGNAL(click_pos(const QString &)), ui->statusbar, SLOT(showMessage(const QString &)));
 }
 
 MainWindow::~MainWindow()

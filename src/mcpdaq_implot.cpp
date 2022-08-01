@@ -17,6 +17,19 @@ mcpdaq_implot::mcpdaq_implot(QWidget *parent) : QWidget(parent)
 
     // rebin combo box
     m_rebin_selector = new QComboBox(this);
+    m_cm_selector = new QComboBox(this);
+    m_scaling_selector = new QComboBox(this);
+
+    QMetaEnum metaEnum = QMetaEnum::fromType<MCPDAQColorGradient::MCPGradPreset>();
+    int ii = 0;
+    for (ii = 0; ii < metaEnum.keyCount(); ii++) {
+        m_cm_selector->addItem(metaEnum.key(ii));
+    }
+
+    QMetaEnum scalEnum = QMetaEnum::fromType<MCPDAQColorGradient::MCPGradScaling>();
+    for (ii = 0; ii < scalEnum.keyCount(); ii++) {
+        m_scaling_selector->addItem(scalEnum.key(ii));
+    }
 
     // CONFIGURE PLOT ITEMS
 
@@ -32,16 +45,15 @@ mcpdaq_implot::mcpdaq_implot(QWidget *parent) : QWidget(parent)
 
     // Useful for selecting rectangles, can do other thing sthere.
     //m_plot->setSelectionRectMode(QCP::srmZoom);
+    // Custom interactions implemented.
     m_plot->setSelectionRectMode(QCP::srmCustom);
-    // use this to implement custom zoom?
-
 
     // set up the QCPColorMap:
-    QCPColorMap *colorMap = new QCPColorMap(m_plot->xAxis, m_plot->yAxis);
+    //QCPColorMap *colorMap = new QCPColorMap(m_plot->xAxis, m_plot->yAxis);
+    colorMap = new QCPColorMap(m_plot->xAxis, m_plot->yAxis);
+
     colorMap->setInterpolate(FALSE);
     colorMap->data()->setSize(x_px, y_px); // we want the color map to have x_px * y_px data points
-    // can set custom ranges -- we just want the pixels
-    //colorMap->data()->setRange(QCPRange(-0.5, 200.5), QCPRange(-0.5, 200.5));
     colorMap->data()->setRange(QCPRange(m_xmin, m_xmax), QCPRange(m_ymin, m_ymax));
 
 
@@ -68,17 +80,14 @@ mcpdaq_implot::mcpdaq_implot(QWidget *parent) : QWidget(parent)
     m_plot->plotLayout()->addElement(0, 1, colorScale); // add it to the right of the main axis rect
     colorScale->setType(QCPAxis::atRight); // scale shall be vertical bar with tick/axis labels right (actually atRight is already the default)
     colorMap->setColorScale(colorScale); // associate the color map with the color scale
-    //colorScale->axis()->setLabel("TUMBODOORS");
+    //colorScale->axis()->setLabel("Counts");
 
     // Choose color gradients that look good!
-    MCPDAQColorGradient *cg = new MCPDAQColorGradient(MCPDAQColorGradient::viridis);
+    //MCPDAQColorGradient *cg = new MCPDAQColorGradient(MCPDAQColorGradient::cubehelix);
+    cg = new MCPDAQColorGradient(MCPDAQColorGradient::cubehelix);
 
-    // set the color gradient of the color map to one of the presets:
-    //colorMap->setGradient(QCPColorGradient::gpHot);
-
+    m_cm_selector->setCurrentIndex(MCPDAQColorGradient::cubehelix);
     colorMap->setGradient(*cg);
-    // we could have also created a QCPColorGradient instance and added own colors to
-    // the gradient, see the documentation of QCPColorGradient for what's possible.
 
     // rescale the data dimension (color) such that all data points lie in the span visualized by the color gradient:
     colorMap->rescaleDataRange();
@@ -116,18 +125,25 @@ mcpdaq_implot::mcpdaq_implot(QWidget *parent) : QWidget(parent)
 
     QLabel *sp_label = new QLabel("Refresh Rate");
     QLabel *rb_label = new QLabel("Rebin");
+    QLabel *cm_label = new QLabel("Color Map");
+    QLabel *sc_label = new QLabel("Scaling");
 
 
     hbox->addWidget(sp_label);
     hbox->addWidget(m_refresh_rate_spinbox);
     hbox->addWidget(rb_label);
     hbox->addWidget(m_rebin_selector);
+    hbox->addWidget(cm_label);
+    hbox->addWidget(m_cm_selector);
+    hbox->addWidget(sc_label);
+    hbox->addWidget(m_scaling_selector);
     hbox->addStretch();
 
     vbox->addWidget(m_plot);
     vbox->addLayout(hbox);
 
     // Handle signals and slots
+
     //connect(m_plot->xAxis, SIGNAL(rangeChanged(QCPRange, QCPRange)), this, SLOT(on_x_range_changed(QCPRange, QCPRange)));
     //connect(m_plot->yAxis, SIGNAL(rangeChanged(QCPRange, QCPRange)), this, SLOT(on_y_range_changed(QCPRange, QCPRange)));
 
@@ -140,6 +156,9 @@ mcpdaq_implot::mcpdaq_implot(QWidget *parent) : QWidget(parent)
 
     //connect(m_plot, SIGNAL(plottableClick(QCPAbstractPlottable*, int, QMouseEvent*)), this, SLOT(plot_click(QCPAbstractPlottable*, int, QMouseEvent*)));
     connect(m_plot, SIGNAL(beforeReplot()), this, SLOT(before_replot()));
+
+    connect(m_cm_selector, SIGNAL(currentIndexChanged(int)), this, SLOT(cm_update(int)));
+    connect(m_scaling_selector, SIGNAL(currentIndexChanged(int)), this, SLOT(sc_update(int)));
 }
 
 // choose the form of the destructor.
@@ -166,51 +185,42 @@ void mcpdaq_implot::rect_accepted(const QRect &rect, QMouseEvent* event)
             // test that zoom is large enough (at least 10x10 pixels)
             m_plot->plottable()->pixelsToCoords(r->bottomLeft(), bl_x, bl_y);
             m_plot->plottable()->pixelsToCoords(r->topRight(), tr_x, tr_y);
-            //qDebug() << tr_x - bl_x << " " << tr_y - bl_y;
 
             if (abs(tr_x - bl_x) > 10.0 && abs(tr_y - bl_y) > 10.0) {
                 m_plot->axisRect()->zoom(*r);
+                m_plot->xAxis->setScaleRatio(m_plot->yAxis, 1.0);
                 m_plot->replot();
             }
         }
     }
 }
 
+//void mcpdaq_implot::on_x_range_changed(QCPRange new_range, QCPRange old_range)
+//{
+//    if (new_range.size() < 10.0) {
+//        // don't update
+//        //m_plot->xAxis->setRange(old_range.bounded(m_xmin, m_xmax));
+//        m_plot->xAxis->setRange(old_range);
+//    } else {
+//        //m_plot->xAxis->setRange(new_range.bounded(m_xmin, m_xmax));
+//        m_plot->xAxis->setRange(new_range);
+//    }
+//    m_plot->xAxis->setScaleRatio(m_plot->yAxis, 1.0);
+//    //qDebug() << "xchange";
+//}
 
-// should this be done at a lower level?
-// or does it need to be combined with y due to aspect ratio?
-// interaction of these two functions and changing the range here can lead to messiness.
-// basically need a slot that catches when either change, fix both at same time?
-
-// or something that catches a zoom attempt and stops before range is ever changed?
-// this seems like the "right" way.
-
-void mcpdaq_implot::on_x_range_changed(QCPRange new_range, QCPRange old_range)
-{
-    if (new_range.size() < 10.0) {
-        // don't update
-        //m_plot->xAxis->setRange(old_range.bounded(m_xmin, m_xmax));
-        m_plot->xAxis->setRange(old_range);
-    } else {
-        //m_plot->xAxis->setRange(new_range.bounded(m_xmin, m_xmax));
-        m_plot->xAxis->setRange(new_range);
-    }
-    m_plot->xAxis->setScaleRatio(m_plot->yAxis, 1.0);
-    //qDebug() << "xchange";
-}
-
-void mcpdaq_implot::on_y_range_changed(QCPRange new_range, QCPRange old_range)
-{
-    if (new_range.size() < 10.0) {
-        // don't update
-        //m_plot->yAxis->setRange(old_range.bounded(m_ymin, m_ymax));
-        m_plot->yAxis->setRange(old_range);
-    } else {
-        //m_plot->yAxis->setRange(new_range.bounded(m_ymin, m_ymax));
-        m_plot->yAxis->setRange(new_range);
-    }
-    m_plot->xAxis->setScaleRatio(m_plot->yAxis, 1.0);
-}
+//void mcpdaq_implot::on_y_range_changed(QCPRange new_range, QCPRange old_range)
+//{
+//    if (new_range.size() < 10.0) {
+//        // don't update
+//        //m_plot->yAxis->setRange(old_range.bounded(m_ymin, m_ymax));
+//        m_plot->yAxis->setRange(old_range);
+//    } else {
+//        //m_plot->yAxis->setRange(new_range.bounded(m_ymin, m_ymax));
+//        m_plot->yAxis->setRange(new_range);
+//    }
+//    m_plot->xAxis->setScaleRatio(m_plot->yAxis, 1.0);
+//}
 
 void mcpdaq_implot::mouse_press(QMouseEvent* mouse_event)
 {
@@ -218,6 +228,14 @@ void mcpdaq_implot::mouse_press(QMouseEvent* mouse_event)
         m_plot->setSelectionRectMode(QCP::srmNone);
     } else if (mouse_event->button() == Qt::RightButton) {
         m_plot->setSelectionRectMode(QCP::srmNone);
+    } else if (mouse_event->button() == Qt::LeftButton) {
+        // emit location and data value
+        double key;
+        double value;
+        m_plot->plottable()->pixelsToCoords(mouse_event->pos(), key, value);
+        QString str;
+        QTextStream(&str) << "X: " << QString::number(key, 'f', 1) << " Y: " << QString::number(value, 'f', 1) << " Data: " << QString::number(colorMap->data()->data(key, value), 'f', 1);
+        emit click_pos(str);
     }
 }
 
@@ -239,10 +257,7 @@ void mcpdaq_implot::mouse_rel(QMouseEvent* mouse_event)
     double tr_x;
     double tr_y;
 
-    //QPoint pos = mouse_event->pos();
-
     m_plot->plottable()->pixelsToCoords(mouse_event->pos(), key, value);
-    //m_plot->plottable()->pixelsToCoords(pos, key, value);
     //qDebug() << key << " " << value;
 
     if (mouse_event->button() == Qt::RightButton) {
@@ -264,14 +279,11 @@ void mcpdaq_implot::mouse_rel(QMouseEvent* mouse_event)
                 // middle button navigation
                 xrange = m_plot->xAxis->range();
                 xdiff = key - (xrange.lower + xrange.size()/2.0);
-                //qDebug() << xdiff;
                 yrange = m_plot->yAxis->range();
                 ydiff = value - (yrange.lower + yrange.size()/2.0);
-                //qDebug() << ydiff;
                 m_plot->xAxis->moveRange(xdiff);
                 m_plot->yAxis->moveRange(ydiff);
                 m_plot->replot();
-                //qDebug() << "move";
             }
         }
     }
@@ -281,6 +293,8 @@ void mcpdaq_implot::mouse_move(QMouseEvent* mouse_event)
 {
     if (mouse_event->buttons() & Qt::MiddleButton) {
         //m_plot->setSelectionRectMode(QCP::srmNone);
+        // may be used for color scaling
+        // TODO
         qDebug() << mouse_event->pos();
     }
 }
@@ -329,43 +343,43 @@ void mcpdaq_implot::mouse_wheel(QWheelEvent* event)
     }
 }
 
-void mcpdaq_implot::plot_click(QCPAbstractPlottable* plottable, int dataIndex, QMouseEvent* event)
-{
-    //UNREFERENCED_PARAMETER(dataIndex);
-    Q_UNUSED(dataIndex);
+//void mcpdaq_implot::plot_click(QCPAbstractPlottable* plottable, int dataIndex, QMouseEvent* event)
+//{
+//    //UNREFERENCED_PARAMETER(dataIndex);
+//    Q_UNUSED(dataIndex);
 
-    double key;
-    double value;
+//    double key;
+//    double value;
 
-    // stuff for middle click re-center
-    double xdiff;
-    double ydiff;
+//    // stuff for middle click re-center
+//    double xdiff;
+//    double ydiff;
 
-    QCPRange xrange;
-    QCPRange yrange;
+//    QCPRange xrange;
+//    QCPRange yrange;
 
-    qDebug() << "PLOT CLICK";
+//    qDebug() << "PLOT CLICK";
 
-    // demo of getting plot click location
-    plottable->pixelsToCoords(event->pos(), key, value);
-    //qDebug() << key << " " << value;
+//    // demo of getting plot click location
+//    plottable->pixelsToCoords(event->pos(), key, value);
+//    //qDebug() << key << " " << value;
 
-    // middle click focus
-    if (event->button() == Qt::MiddleButton) {
-        // middle button navigation
+//    // middle click focus
+//    if (event->button() == Qt::MiddleButton) {
+//        // middle button navigation
 
-        xrange = m_plot->xAxis->range();
-        xdiff = key - (xrange.lower + xrange.size()/2.0);
-        //qDebug() << xdiff;
-        yrange = m_plot->yAxis->range();
-        ydiff = value - (yrange.lower + yrange.size()/2.0);
-        //qDebug() << ydiff;
-        m_plot->xAxis->moveRange(xdiff);
-        m_plot->yAxis->moveRange(ydiff);
-        m_plot->replot();
-        qDebug() << "move";
-    }
-}
+//        xrange = m_plot->xAxis->range();
+//        xdiff = key - (xrange.lower + xrange.size()/2.0);
+//        //qDebug() << xdiff;
+//        yrange = m_plot->yAxis->range();
+//        ydiff = value - (yrange.lower + yrange.size()/2.0);
+//        //qDebug() << ydiff;
+//        m_plot->xAxis->moveRange(xdiff);
+//        m_plot->yAxis->moveRange(ydiff);
+//        m_plot->replot();
+//        qDebug() << "move";
+//    }
+//}
 
 void mcpdaq_implot::resizeEvent(QResizeEvent* event)
 {
@@ -379,4 +393,32 @@ void mcpdaq_implot::resizeEvent(QResizeEvent* event)
 void mcpdaq_implot::before_replot()
 {
     m_plot->xAxis->setScaleRatio(m_plot->yAxis, 1.0);
+}
+
+void mcpdaq_implot::cm_update(int index)
+{
+    // index of cmap changed.
+    //MCPDAQColorGradient *cg = new MCPDAQColorGradient(static_cast<MCPDAQColorGradient::MCPGradPreset>(index));
+    //cg = new MCPDAQColorGradient(static_cast<MCPDAQColorGradient::MCPGradPreset>(index));
+    cg->set_preset(static_cast<MCPDAQColorGradient::MCPGradPreset>(index));
+
+    QMetaEnum metaEnum = QMetaEnum::fromType<MCPDAQColorGradient::MCPGradScaling>();
+
+    // Need to check scaling settings and update appropriately
+    cg->setScaling((MCPDAQColorGradient::MCPGradScaling)metaEnum.value(m_scaling_selector->currentIndex()));
+
+    colorMap->setGradient(*cg);
+    m_plot->replot();
+    //qDebug() << m_plot->replotTime();
+}
+
+void mcpdaq_implot::sc_update(int index)
+{
+    // index of scaling changed.
+    QMetaEnum metaEnum = QMetaEnum::fromType<MCPDAQColorGradient::MCPGradScaling>();
+
+    cg->setScaling((MCPDAQColorGradient::MCPGradScaling)metaEnum.value(index));
+    colorMap->setGradient(*cg);
+    m_plot->replot();
+    //qDebug() << m_plot->replotTime();
 }

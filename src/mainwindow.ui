@@ -71,7 +71,14 @@
      <string>File</string>
     </property>
    </widget>
+   <widget class="QMenu" name="menuConfiguration">
+    <property name="title">
+     <string>Configuration</string>
+    </property>
+    <addaction name="actionEtherDAQ"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuConfiguration"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QToolBar" name="toolBar">
@@ -89,6 +96,11 @@
   <action name="actionMonitor">
    <property name="text">
     <string>Monitor</string>
+   </property>
+  </action>
+  <action name="actionEtherDAQ">
+   <property name="text">
+    <string>EtherDAQ</string>
    </property>
   </action>
  </widget>

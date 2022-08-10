@@ -1,4 +1,4 @@
-QT       += core gui
+QT       += core gui network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 
@@ -13,17 +13,20 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     mcpdaq_implot.cpp \
+    mcpdaqetherdaqdialog.cpp \
     qcustomplot.cpp
 
 HEADERS += \
     MCPDAQutil.h \
     mainwindow.h \
     mcpdaq_implot.h \
+    mcpdaqetherdaqdialog.h \
     qcustomplot.h \
     tinycolormap.hpp
 
 FORMS += \
-    mainwindow.ui
+    mainwindow.ui \
+    mcpdaqetherdaqdialog.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

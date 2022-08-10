@@ -67,7 +67,7 @@ mcpdaq_implot::mcpdaq_implot(QWidget *parent) : QWidget(parent)
         for (j = 0; j < y_px; j++) {
             //colorMap->data()->setCell(i, j, i*j);
             //colorMap->data()->setCell(i, j, sin(i/6.0));
-            colorMap->data()->setCell(i, j, cos(i/6.0) + cos(j/6.0));
+            colorMap->data()->setCell(i, j, 100.0*(cos(i/6.0) + cos(j/6.0)));
             // checkerboard
             //colorMap->data()->setCell(i, j, c);
             //c += 1;

@@ -1,7 +1,21 @@
 #ifndef MCPDAQUTIL_H
 #define MCPDAQUTIL_H
 
+//#include <QtGlobal>
+#include <QHostAddress>
+
 #include "qcustomplot.h"
+
+
+typedef struct {
+    QHostAddress addr;
+    quint16 port;
+    quint16 pkt_len;
+    quint8 xbits;
+    quint8 ybits;
+    quint8 pbits;
+    double aratio;
+} etherdaq_config_t;
 
 
 // Color gradient class to just add several desired color gradients to what is already available in QCustomPlot

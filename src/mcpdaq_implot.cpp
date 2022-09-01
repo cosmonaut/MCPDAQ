@@ -427,6 +427,7 @@ void mcpdaq_implot::before_replot()
     m_plot->xAxis->setScaleRatio(m_plot->yAxis, 1.0);
 }
 
+// colormap update
 void mcpdaq_implot::cm_update(int index)
 {
     // index of cmap changed.
@@ -440,10 +441,11 @@ void mcpdaq_implot::cm_update(int index)
     cg->setScaling((MCPDAQColorGradient::MCPGradScaling)metaEnum.value(m_scaling_selector->currentIndex()));
 
     colorMap->setGradient(*cg);
-    m_plot->replot();
+    m_plot->replot(QCustomPlot::rpQueuedReplot);
     //qDebug() << m_plot->replotTime();
 }
 
+// colormap scaling update
 void mcpdaq_implot::sc_update(int index)
 {
     // index of scaling changed.
@@ -451,7 +453,7 @@ void mcpdaq_implot::sc_update(int index)
 
     cg->setScaling((MCPDAQColorGradient::MCPGradScaling)metaEnum.value(index));
     colorMap->setGradient(*cg);
-    m_plot->replot();
+    m_plot->replot(QCustomPlot::rpQueuedReplot);
     //qDebug() << m_plot->replotTime();
 }
 

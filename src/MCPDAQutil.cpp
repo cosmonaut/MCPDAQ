@@ -23,6 +23,8 @@ void MCPDAQColorGradient::set_preset(MCPGradPreset preset)
 {
     int i = 0;
     float f = 0.0;
+    const QCPRange range = QCPRange(0.0, 1.0);
+    QMap<double, QColor> cmap;
 
     clearColorStops();
     switch(preset) {
@@ -84,18 +86,53 @@ void MCPDAQColorGradient::set_preset(MCPGradPreset preset)
         break;
     case gpGrayscale:
         loadPreset(QCPColorGradient::gpGrayscale);
+        for (i = 0; i < 256; i++) {
+            f = i/255.0;
+            QColor c = QColor(color(f, range, false));
+            cmap.insert(f, c);
+        }
+        clearColorStops();
+        setColorStops(cmap);
         break;
     case gpHot:
         loadPreset(QCPColorGradient::gpHot);
+        for (i = 0; i < 256; i++) {
+            f = i/255.0;
+            QColor c = QColor(color(f, range, false));
+            cmap.insert(f, c);
+        }
+        clearColorStops();
+        setColorStops(cmap);
         break;
     case gpCold:
         loadPreset(QCPColorGradient::gpCold);
+        for (i = 0; i < 256; i++) {
+            f = i/255.0;
+            QColor c = QColor(color(f, range, false));
+            cmap.insert(f, c);
+        }
+        clearColorStops();
+        setColorStops(cmap);
         break;
     case gpNight:
         loadPreset(QCPColorGradient::gpNight);
+        for (i = 0; i < 256; i++) {
+            f = i/255.0;
+            QColor c = QColor(color(f, range, false));
+            cmap.insert(f, c);
+        }
+        clearColorStops();
+        setColorStops(cmap);
         break;
     case gpThermal:
         loadPreset(QCPColorGradient::gpThermal);
+        for (i = 0; i < 256; i++) {
+            f = i/255.0;
+            QColor c = QColor(color(f, range, false));
+            cmap.insert(f, c);
+        }
+        clearColorStops();
+        setColorStops(cmap);
         break;
     }
 }
@@ -199,10 +236,28 @@ void MCPDAQColorGradient::set_squared_colorstops(void)
     }
 }
 
-// To be implemented: currently just a linear scale.
+// Somewhat of a hack -- this hides all of the gradient in a tiny portion near
+// 0 but has the desired effect of showing any pixel as fullbright if there are
+// more than 0 photons in that pixel
 void MCPDAQColorGradient::set_binary_colorstops(void)
 {
-    set_lin_colorstops();
+    QList<QColor> cvals;
+
+    int n;
+    int i;
+    double f;
+
+    cvals = colorStops().values();
+    n = cvals.size();
+
+    clearColorStops();
+
+    for (i = 1; i < n - 1; i++) {
+        f = (double)i*1e-7;
+        setColorStopAt(f, cvals[i]);
+    }
+    setColorStopAt(0.0, cvals[0]);
+    setColorStopAt(1.0, cvals[n - 1]);
 }
 
 void MCPDAQColorGradient::setScaling(MCPGradScaling scaling)
@@ -218,9 +273,7 @@ void MCPDAQColorGradient::setScaling(MCPGradScaling scaling)
         set_squared_colorstops();
         break;
     case MCPDAQColorGradient::BIN:
-        // not yet implemented.
-        set_lin_colorstops();
-        //set_binary_colorstops();
+        set_binary_colorstops();
         break;
     default:
         set_lin_colorstops();

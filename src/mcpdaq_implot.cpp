@@ -7,7 +7,6 @@ mcpdaq_implot::mcpdaq_implot(QWidget *parent) : QWidget(parent)
     // layout for controls under plot
     QHBoxLayout *hbox = new QHBoxLayout();
 
-
     // refresh rate spinbox
     m_refresh_rate_spinbox = new QDoubleSpinBox(this);
     m_refresh_rate_spinbox->setDecimals(1);
@@ -61,10 +60,8 @@ mcpdaq_implot::mcpdaq_implot(QWidget *parent) : QWidget(parent)
     //colorMap->layer()->setMode(QCPLayer::lmBuffered);
 
     colorMap->setInterpolate(false);
-    qDebug() << "set size";
     colorMap->data()->setSize(x_px, y_px); // we want the color map to have x_px * y_px data points
     colorMap->data()->setRange(QCPRange(m_xmin, m_xmax), QCPRange(m_ymin, m_ymax));
-    qDebug() << "size set";
 
     //m_data = colorMap->data();
 
@@ -74,7 +71,6 @@ mcpdaq_implot::mcpdaq_implot(QWidget *parent) : QWidget(parent)
     //int c = 0;
 
     colorMap->data()->fill(0.0);
-    qDebug() << "fill";
 
     // Blast some nonsense data in there...
     //int i = 0;
@@ -111,7 +107,6 @@ mcpdaq_implot::mcpdaq_implot(QWidget *parent) : QWidget(parent)
 
     // rescale the data dimension (color) such that all data points lie in the span visualized by the color gradient:
     colorMap->rescaleDataRange();
-    qDebug() << "rescale";
 
     // make sure the axis rect and color scale synchronize their bottom and top margins (so they line up):
     QCPMarginGroup *marginGroup = new QCPMarginGroup(m_plot);
@@ -143,7 +138,6 @@ mcpdaq_implot::mcpdaq_implot(QWidget *parent) : QWidget(parent)
 
     //m_plot->rescaleAxes();
     m_plot->replot();
-    qDebug() << "replot";
     //m_plot->setMinimumSize(QSize(500, 500));
 
     //QSizePolicy p = this->sizePolicy();
@@ -155,7 +149,6 @@ mcpdaq_implot::mcpdaq_implot(QWidget *parent) : QWidget(parent)
     QLabel *rb_label = new QLabel("Rebin");
     QLabel *cm_label = new QLabel("Color Map");
     QLabel *sc_label = new QLabel("Scaling");
-
 
     hbox->addWidget(sp_label);
     hbox->addWidget(m_refresh_rate_spinbox);
@@ -189,8 +182,6 @@ mcpdaq_implot::mcpdaq_implot(QWidget *parent) : QWidget(parent)
     connect(m_scaling_selector, SIGNAL(currentIndexChanged(int)), this, SLOT(sc_update(int)));
 
     connect(m_replot_timer, SIGNAL(timeout()), this, SLOT(vid_replot()));
-
-    qDebug() << "done";
 }
 
 // choose the form of the destructor.

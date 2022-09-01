@@ -52,6 +52,18 @@
        <property name="frameShadow">
         <enum>QFrame::Plain</enum>
        </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="mcpdaq_countplot" name="widget" native="true">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
      </widget>
     </item>
@@ -118,6 +130,12 @@
    <class>mcpdaq_implot</class>
    <extends>QWidget</extends>
    <header>mcpdaq_implot.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>mcpdaq_countplot</class>
+   <extends>QWidget</extends>
+   <header>mcpdaq_countplot.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -50,16 +50,12 @@ void MainWindow::etherdaq(void)
     int r = etherdaq_dialog->exec();
     if (r == QDialog::Accepted) {
         // update settings.
-        //*m_ec = etherdaq_dialog->m_ec;
         m_eth_iface->set_ec(&(etherdaq_dialog->m_ec));
-        //qDebug() << m_ec->addr;
-        // Need to close/reopen port?
     }
 }
 
 void MainWindow::monitor(bool c)
 {
-    //qDebug () << c;
     if (c == true) {
         //
         m_eth_iface->open();

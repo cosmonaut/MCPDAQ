@@ -15,6 +15,7 @@ SOURCES += \
     MCPDAQutil.cpp \
     main.cpp \
     mainwindow.cpp \
+    mcpdaq_countplot.cpp \
     mcpdaq_implot.cpp \
     mcpdaqetherdaqdialog.cpp \
     mcpdaqetherdaqiface.cpp \
@@ -23,6 +24,7 @@ SOURCES += \
 HEADERS += \
     MCPDAQutil.h \
     mainwindow.h \
+    mcpdaq_countplot.h \
     mcpdaq_implot.h \
     mcpdaq_types.h \
     mcpdaqetherdaqdialog.h \

@@ -11,7 +11,7 @@ class mcpdaq_implot : public QWidget
 {
     Q_OBJECT
 public:
-    mcpdaq_implot(QWidget *parent = 0);
+    mcpdaq_implot(QWidget *parent = nullptr);
     //mcpdaq_implot(QWidget *parent = 0) : QCustomPlot(parent){};
     ~mcpdaq_implot();
 

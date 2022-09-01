@@ -41,7 +41,7 @@
        </property>
        <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
-         <widget class="mcpdaq_implot" name="widget" native="true"/>
+         <widget class="mcpdaq_implot" name="widget_implot" native="true"/>
         </item>
        </layout>
       </widget>
@@ -85,6 +85,12 @@
    <property name="windowTitle">
     <string>toolBar</string>
    </property>
+   <property name="movable">
+    <bool>false</bool>
+   </property>
+   <property name="floatable">
+    <bool>false</bool>
+   </property>
    <attribute name="toolBarArea">
     <enum>TopToolBarArea</enum>
    </attribute>
@@ -94,6 +100,9 @@
    <addaction name="actionMonitor"/>
   </widget>
   <action name="actionMonitor">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>Monitor</string>
    </property>

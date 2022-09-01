@@ -31,49 +31,68 @@ mcpdaq_implot::mcpdaq_implot(QWidget *parent) : QWidget(parent)
         m_scaling_selector->addItem(scalEnum.key(ii));
     }
 
+    m_replot_timer = new QTimer();
+    m_replot_timer->setInterval(1000);
+
     // CONFIGURE PLOT ITEMS
 
     m_plot = new QCustomPlot();
+    //m_plot->setOpenGl(true);
+    //qDebug() << m_plot->openGl();
 
-    // configure axis rect:
-    // this will also allow rescaling the color scale by dragging/zooming
+    // Old zoom stuff...
     //m_plot->setInteractions(QCP::iRangeDrag|QCP::iRangeZoom);
     //m_plot->setInteractions(QCP::iRangeDrag);
 
     m_plot->axisRect()->setupFullAxesBox(true);
-    // how best to handle zoom?
 
     // Useful for selecting rectangles, can do other thing sthere.
     //m_plot->setSelectionRectMode(QCP::srmZoom);
     // Custom interactions implemented.
     m_plot->setSelectionRectMode(QCP::srmCustom);
 
+    //m_plot->addLayer("image", m_plot->layer("main"), QCustomPlot::limAbove);
+    //m_plot->layer("image")->setMode(QCPLayer::lmBuffered);
+
     // set up the QCPColorMap:
     //QCPColorMap *colorMap = new QCPColorMap(m_plot->xAxis, m_plot->yAxis);
     colorMap = new QCPColorMap(m_plot->xAxis, m_plot->yAxis);
+    //colorMap->setLayer("image");
+    //colorMap->layer()->setMode(QCPLayer::lmBuffered);
 
-    colorMap->setInterpolate(FALSE);
+    colorMap->setInterpolate(false);
+    qDebug() << "set size";
     colorMap->data()->setSize(x_px, y_px); // we want the color map to have x_px * y_px data points
     colorMap->data()->setRange(QCPRange(m_xmin, m_xmax), QCPRange(m_ymin, m_ymax));
+    qDebug() << "size set";
 
+    //m_data = colorMap->data();
 
     // Blast some nonsense data in there...
-    int i = 0;
-    int j = 0;
+    //int i = 0;
+    //int j = 0;
     //int c = 0;
 
-    for (i = 0; i < x_px; i++) {
-        //c = i % 2;
-        for (j = 0; j < y_px; j++) {
-            //colorMap->data()->setCell(i, j, i*j);
-            //colorMap->data()->setCell(i, j, sin(i/6.0));
-            colorMap->data()->setCell(i, j, 100.0*(cos(i/6.0) + cos(j/6.0)));
-            // checkerboard
-            //colorMap->data()->setCell(i, j, c);
-            //c += 1;
-            //c = c % 2;
-        }
-    }
+    colorMap->data()->fill(0.0);
+    qDebug() << "fill";
+
+    // Blast some nonsense data in there...
+    //int i = 0;
+    //int j = 0;
+    //int c = 0;
+
+//    for (i = 0; i < x_px; i++) {
+//        //c = i % 2;
+//        for (j = 0; j < y_px; j++) {
+//            //colorMap->data()->setCell(i, j, i*j);
+//            //colorMap->data()->setCell(i, j, sin(i/6.0));
+//            colorMap->data()->setCell(i, j, 100.0*(cos(i/6.0) + cos(j/6.0)));
+//            // checkerboard
+//            //colorMap->data()->setCell(i, j, c);
+//            //c += 1;
+//            //c = c % 2;
+//        }
+//    }
 
     // add a color scale:
     QCPColorScale *colorScale = new QCPColorScale(m_plot);
@@ -85,12 +104,14 @@ mcpdaq_implot::mcpdaq_implot(QWidget *parent) : QWidget(parent)
     // Choose color gradients that look good!
     //MCPDAQColorGradient *cg = new MCPDAQColorGradient(MCPDAQColorGradient::cubehelix);
     cg = new MCPDAQColorGradient(MCPDAQColorGradient::cubehelix);
+    // TODO: there is a bug with the night and grayscale colormaps not doing log/sqrt scale properly...
 
     m_cm_selector->setCurrentIndex(MCPDAQColorGradient::cubehelix);
     colorMap->setGradient(*cg);
 
     // rescale the data dimension (color) such that all data points lie in the span visualized by the color gradient:
     colorMap->rescaleDataRange();
+    qDebug() << "rescale";
 
     // make sure the axis rect and color scale synchronize their bottom and top margins (so they line up):
     QCPMarginGroup *marginGroup = new QCPMarginGroup(m_plot);
@@ -101,8 +122,14 @@ mcpdaq_implot::mcpdaq_implot(QWidget *parent) : QWidget(parent)
     m_plot->rescaleAxes();
 
     // antialias settings
-    m_plot->setNoAntialiasingOnDrag(TRUE);
-    m_plot->setNotAntialiasedElement(QCP::aeAll, TRUE);
+    m_plot->setNoAntialiasingOnDrag(true);
+    m_plot->setNotAntialiasedElements(QCP::aeAll);
+    m_plot->setPlottingHints(QCP::phFastPolylines);
+    //m_plot->setNotAntialiasedElement(QCP::aeAll, true);
+
+    //ui->mPlot->setNotAntialiasedElements(QCP::aeAll);
+    //ui->mPlot->setNoAntialiasingOnDrag(true);
+    //ui->mPlot->setPlottingHints(QCP::phFastPolylines);
 
     //m_plot->axisRect()->setBackground(QBrush(QColor(QColor("black"))));
     m_plot->setBackground(QBrush(QWidget::palette().color(QWidget::backgroundRole())));
@@ -116,6 +143,7 @@ mcpdaq_implot::mcpdaq_implot(QWidget *parent) : QWidget(parent)
 
     //m_plot->rescaleAxes();
     m_plot->replot();
+    qDebug() << "replot";
     //m_plot->setMinimumSize(QSize(500, 500));
 
     //QSizePolicy p = this->sizePolicy();
@@ -159,6 +187,10 @@ mcpdaq_implot::mcpdaq_implot(QWidget *parent) : QWidget(parent)
 
     connect(m_cm_selector, SIGNAL(currentIndexChanged(int)), this, SLOT(cm_update(int)));
     connect(m_scaling_selector, SIGNAL(currentIndexChanged(int)), this, SLOT(sc_update(int)));
+
+    connect(m_replot_timer, SIGNAL(timeout()), this, SLOT(vid_replot()));
+
+    qDebug() << "done";
 }
 
 // choose the form of the destructor.
@@ -241,7 +273,7 @@ void mcpdaq_implot::mouse_press(QMouseEvent* mouse_event)
 
 void mcpdaq_implot::mouse_rel(QMouseEvent* mouse_event)
 {
-    qDebug() << "mcap";
+    //qDebug() << "mcap";
 
     double key;
     double value;
@@ -421,4 +453,51 @@ void mcpdaq_implot::sc_update(int index)
     colorMap->setGradient(*cg);
     m_plot->replot();
     //qDebug() << m_plot->replotTime();
+}
+
+// Efficiency here will be interesting.
+// https://www.qcustomplot.com/index.php/support/forum/1838
+void mcpdaq_implot::append_data(const QList<photon_t> &data)
+{
+    //
+    QList<photon_t>::ConstIterator it = data.constBegin();
+    for (; it != data.constEnd(); ++it) {
+        const photon_t& photon = *it;
+        //qDebug() << photon.x;
+        colorMap->data()->setCell(photon.x, photon.y, colorMap->data()->cell(photon.x, photon.y) + 1);
+        //colorMap->data()->setCell(photon.x, photon.y, 10.0);
+    }
+}
+
+void mcpdaq_implot::vid_replot()
+{
+    //QElapsedTimer timer;
+    //timer.start();
+
+    colorMap->data()->setCell(10, 10, 1.0);
+
+    //qDebug() << timer.elapsed();
+
+    //colorMap->data()->setData(10, 10, 20.0);
+
+    //colorMap->data()->setCell(10, 10, 1.0);
+
+    colorMap->rescaleDataRange();
+    m_plot->replot(QCustomPlot::rpQueuedReplot);
+    //m_plot->layer("image")->replot();
+    //qDebug() << timer.elapsed();
+
+    qDebug() << m_plot->replotTime();
+    //qDebug() << m_plot->layerCount();
+    //qDebug() << timer.elapsed();
+    //qDebug();
+}
+
+void mcpdaq_implot::run(bool stat)
+{
+    if (stat == true) {
+        m_replot_timer->start();
+    } else {
+        m_replot_timer->stop();
+    }
 }

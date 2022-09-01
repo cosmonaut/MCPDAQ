@@ -4,7 +4,8 @@
 #include <QMainWindow>
 #include "qcustomplot.h"
 
-#include "MCPDAQUtil.h"
+#include "MCPDAQutil.h"
+#include "mcpdaqetherdaqiface.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -20,12 +21,14 @@ public:
 
 public slots:
     void etherdaq(void);
+    void monitor(bool);
 
 private:
     Ui::MainWindow *ui;
     //QCustomPlot *customPlot;
     //MCPDAQEtherDaqDialog *etherdaq_dialog;
-    etherdaq_config_t *m_ec;
+    //etherdaq_config_t *m_ec;
+    MCPDAQEtherDaqIface *m_eth_iface;
 };
 
 #endif // MAINWINDOW_H

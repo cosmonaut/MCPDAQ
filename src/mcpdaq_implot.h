@@ -5,6 +5,7 @@
 
 #include "qcustomplot.h"
 #include "MCPDAQutil.h"
+#include "mcpdaq_types.h"
 
 class mcpdaq_implot : public QWidget
 {
@@ -32,6 +33,11 @@ public slots:
     void cm_update(int index);
     void sc_update(int index);
 
+    void append_data(const QList<photon_t> &data);
+
+    void vid_replot(void);
+    void run(bool);
+
 signals:
     void click_pos(const QString & message);
 
@@ -44,17 +50,20 @@ private:
     QCPColorMap *colorMap;
     MCPDAQColorGradient *cg;
 
+    //QCPColorMapData *m_data;
+
     // controls
     // This spinbox should probably become a combo box for "persistance"
     QDoubleSpinBox *m_refresh_rate_spinbox;
     QComboBox *m_rebin_selector;
     QComboBox *m_cm_selector;
     QComboBox *m_scaling_selector;
+    QTimer *m_replot_timer;
 
 
 
-    uint8_t x_bit = 10;
-    uint8_t y_bit = 10;
+    uint8_t x_bit = 11;
+    uint8_t y_bit = 11;
 
     uint16_t x_px = 1 << x_bit;
     uint16_t y_px = 1 << y_bit;

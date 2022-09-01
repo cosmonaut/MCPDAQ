@@ -16,18 +16,15 @@ class MCPDAQEtherDaqDialog : public QDialog
 public:
     //explicit MCPDAQEtherDaqDialog(QWidget *parent = nullptr, etherdaq_config_t *ec);
     explicit MCPDAQEtherDaqDialog(QWidget *parent, etherdaq_config_t *ec);
-
     ~MCPDAQEtherDaqDialog();
 
     etherdaq_config_t m_ec;
-
 
 private slots:
     void done(int r);
 
 private:
     Ui::MCPDAQEtherDaqDialog *ui;
-    //etherdaq_config_t m_ec;
 };
 
 #endif // MCPDAQETHERDAQDIALOG_H

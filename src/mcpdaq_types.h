@@ -1,6 +1,9 @@
 #ifndef MCPDAQ_TYPES_H
 #define MCPDAQ_TYPES_H
 
+#include <QtGlobal>
+#include <QHostAddress>
+
 typedef struct {
     QHostAddress addr;
     quint16 port;

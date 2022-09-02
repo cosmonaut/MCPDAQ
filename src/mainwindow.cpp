@@ -12,6 +12,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->statusbar->showMessage("OH HI, MARK");
 
+    m_data = new mcpdaq_data(this);
+
     // etherdaq interface
     m_eth_iface = new MCPDAQEtherDaqIface(this);
 
@@ -31,10 +33,19 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionEtherDAQ, SIGNAL(triggered()), this, SLOT(etherdaq()));
     // monitor button
     connect(ui->actionMonitor, SIGNAL(triggered(bool)), this, SLOT(monitor(bool)));
+    connect(ui->actionMonitor, SIGNAL(triggered(bool)), m_data, SLOT(monitor_rate(bool)));
+
+    // plot connections
     //connect(ui->actionMonitor, SIGNAL(checkableChanged(bool)), this, SLOT(monitor(bool)));
     connect(ui->actionMonitor, SIGNAL(triggered(bool)), ui->widget_implot, SLOT(run(bool)));
+    connect(m_data, SIGNAL(count_rate(double)), ui->widget_crplot, SLOT(append_data(double)));
 
-    // etherdaq connections
+
+    // Etherdaq connections
+
+    // main data aggregator?
+    connect(m_eth_iface, SIGNAL(valid_data(const QList<photon_t> &)), m_data, SLOT(append_data(const QList<photon_t> &)));
+    // implot
     connect(m_eth_iface, SIGNAL(valid_data(const QList<photon_t> &)), ui->widget_implot, SLOT(append_data(const QList<photon_t> &)));
 }
 

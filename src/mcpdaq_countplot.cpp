@@ -11,7 +11,7 @@ mcpdaq_countplot::mcpdaq_countplot(QWidget *parent)
     m_xdata = new QList<double>;
 
     for (i = 0; i < 60; i++) {
-        m_xdata->insert(i, (double)i);
+        m_xdata->insert(i, (double)(59 - i));
         m_ydata->enqueue(0.0);
     }
 
@@ -30,6 +30,9 @@ mcpdaq_countplot::mcpdaq_countplot(QWidget *parent)
     m_plot->xAxis->setRangeReversed(true);
     m_plot->graph()->rescaleAxes(true);
     m_plot->axisRect()->setupFullAxesBox();
+
+    m_plot->xAxis->setLabel("Time (s)");
+    m_plot->yAxis->setLabel("Rate (counts/s)");
 
     // Performance settings.
     m_plot->setNoAntialiasingOnDrag(true);
@@ -50,5 +53,16 @@ void mcpdaq_countplot::append_data(double c)
     // pop old data to maintain size
     m_ydata->dequeue();
     m_plot->graph()->setData(*m_xdata, *m_ydata);
-    m_plot->graph()->rescaleAxes(true);
+    m_plot->graph()->rescaleAxes(false);
+
+    // Pretty up the range.
+    double max = *std::max_element(m_ydata->begin(), m_ydata->end());
+    max = max + max/10.0;
+    if (max == 0.0) {
+        max = 1.0;
+    }
+    QCPRange yrange = QCPRange(0.0, max);
+    m_plot->yAxis->setRange(yrange);
+
+    m_plot->replot(QCustomPlot::rpQueuedReplot);
 }

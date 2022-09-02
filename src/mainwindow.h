@@ -6,6 +6,7 @@
 
 #include "MCPDAQutil.h"
 #include "mcpdaqetherdaqiface.h"
+#include "mcpdaq_data.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -29,6 +30,7 @@ private:
     //MCPDAQEtherDaqDialog *etherdaq_dialog;
     //etherdaq_config_t *m_ec;
     MCPDAQEtherDaqIface *m_eth_iface;
+    mcpdaq_data *m_data;
 };
 
 #endif // MAINWINDOW_H

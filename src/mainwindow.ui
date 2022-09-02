@@ -54,7 +54,7 @@
        </property>
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <item>
-         <widget class="mcpdaq_countplot" name="widget" native="true">
+         <widget class="mcpdaq_countplot" name="widget_crplot" native="true">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
             <horstretch>0</horstretch>

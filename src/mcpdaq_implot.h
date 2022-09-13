@@ -34,6 +34,7 @@ public slots:
     void sc_update(int index);
 
     void append_data(const QList<photon_t> &data);
+    void clear_data(void);
 
     void vid_replot(void);
     void run(bool);
@@ -58,8 +59,8 @@ private:
     QComboBox *m_rebin_selector;
     QComboBox *m_cm_selector;
     QComboBox *m_scaling_selector;
+    // TODO: sync to mainwindow 1 Hz timer
     QTimer *m_replot_timer;
-
 
 
     uint8_t x_bit = 11;

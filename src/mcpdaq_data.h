@@ -14,7 +14,6 @@ public:
 
 public slots:
     void append_data(const QList<photon_t> &data);
-    void monitor_rate(bool);
     void update_cr(void);
 
 signals:
@@ -22,7 +21,6 @@ signals:
 
 private:
     QList<photon_t> *photon_data;
-    QTimer *rate_timer;
 
     size_t last_count;
     size_t current_count;

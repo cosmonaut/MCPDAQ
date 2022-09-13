@@ -14,6 +14,7 @@ public:
 public slots:
     // Append a single data point
     void append_data(double c);
+    void clear_data(void);
 
 signals:
 

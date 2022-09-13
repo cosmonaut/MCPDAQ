@@ -34,6 +34,8 @@ mcpdaq_countplot::mcpdaq_countplot(QWidget *parent)
     //m_plot->axisRect()->setAutoMargins(QCP::msNone);
     //m_plot->axisRect()->setMargins(QMargins(10,10,10,10));
     m_plot->axisRect()->setMinimumMargins(QMargins(0,0,0,0));
+    m_plot->xAxis->setPadding(0);
+    m_plot->yAxis->setPadding(0);
 
     m_plot->xAxis->setLabel("Time (s)");
     m_plot->yAxis->setLabel("Rate (counts/s)");
@@ -70,3 +72,12 @@ void mcpdaq_countplot::append_data(double c)
 
     m_plot->replot(QCustomPlot::rpQueuedReplot);
 }
+
+void mcpdaq_countplot::clear_data(void)
+{
+    m_ydata->fill(0.0);
+    append_data(0.0);
+    m_plot->replot();
+}
+
+

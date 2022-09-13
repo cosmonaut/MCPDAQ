@@ -13,6 +13,7 @@ public:
 
 public slots:
     void append_data(const QList<photon_t> &data);
+    void clear_data(void);
     void vid_replot(void);
 
 signals:

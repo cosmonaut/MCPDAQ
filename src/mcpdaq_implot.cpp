@@ -137,6 +137,8 @@ mcpdaq_implot::mcpdaq_implot(QWidget *parent) : QWidget(parent)
     m_plot->xAxis->setScaleRatio(m_plot->yAxis, 1.0);
 
     m_plot->axisRect()->setMinimumMargins(QMargins(0,0,0,0));
+    m_plot->xAxis->setPadding(0);
+    m_plot->yAxis->setPadding(0);
 
     //m_plot->rescaleAxes();
     m_plot->replot();
@@ -464,18 +466,20 @@ void mcpdaq_implot::append_data(const QList<photon_t> &data)
     }
 }
 
+void mcpdaq_implot::clear_data(void)
+{
+    colorMap->data()->fill(0.0);
+    vid_replot();
+}
+
 void mcpdaq_implot::vid_replot()
 {
     //QElapsedTimer timer;
     //timer.start();
 
-    colorMap->data()->setCell(10, 10, 1.0);
+    //colorMap->data()->setCell(10, 10, 1.0);
 
     //qDebug() << timer.elapsed();
-
-    //colorMap->data()->setData(10, 10, 20.0);
-
-    //colorMap->data()->setCell(10, 10, 1.0);
 
     colorMap->rescaleDataRange();
     m_plot->replot(QCustomPlot::rpQueuedReplot);

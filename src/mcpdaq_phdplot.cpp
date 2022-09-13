@@ -33,6 +33,9 @@ mcpdaq_phdplot::mcpdaq_phdplot(QWidget *parent)
     m_plot->axisRect()->setupFullAxesBox();
 
     m_plot->axisRect()->setMinimumMargins(QMargins(0,0,0,0));
+    m_plot->xAxis->setPadding(0);
+    m_plot->yAxis->setPadding(0);
+
 
     m_plot->xAxis->setLabel("Pulse height");
     m_plot->yAxis->setLabel("Frequency");
@@ -61,6 +64,12 @@ void mcpdaq_phdplot::append_data(const QList<photon_t> &data)
         (*m_ydata)[photon.p] = m_ydata->at(photon.p) + 1.0;
     }
     //m_plot->graph()->setData(*m_xdata, *m_ydata);
+}
+
+void mcpdaq_phdplot::clear_data(void)
+{
+    m_ydata->fill(0.0);
+    vid_replot();
 }
 
 void mcpdaq_phdplot::vid_replot(void) {

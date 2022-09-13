@@ -17,6 +17,7 @@ MainWindow::MainWindow(QWidget *parent)
     // etherdaq interface
     m_eth_iface = new MCPDAQEtherDaqIface(this);
 
+    // Main 1 Hz timer
     m_replot_timer = new QTimer(this);
     m_replot_timer->setInterval(1000);
 
@@ -36,13 +37,13 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionEtherDAQ, SIGNAL(triggered()), this, SLOT(etherdaq()));
     // monitor button
     connect(ui->actionMonitor, SIGNAL(triggered(bool)), this, SLOT(monitor(bool)));
-    connect(ui->actionMonitor, SIGNAL(triggered(bool)), m_data, SLOT(monitor_rate(bool)));
 
     // plot connections
-    //connect(ui->actionMonitor, SIGNAL(checkableChanged(bool)), this, SLOT(monitor(bool)));
     connect(ui->actionMonitor, SIGNAL(triggered(bool)), ui->widget_implot, SLOT(run(bool)));
-    connect(m_data, SIGNAL(count_rate(double)), ui->widget_crplot, SLOT(append_data(double)));
 
+    // Connect main 1 Hz timer to get count rate.
+    connect(m_replot_timer, SIGNAL(timeout()), m_data, SLOT(update_cr()));
+    connect(m_data, SIGNAL(count_rate(double)), ui->widget_crplot, SLOT(append_data(double)));
 
     // Etherdaq connections
 
@@ -75,12 +76,16 @@ void MainWindow::etherdaq(void)
 void MainWindow::monitor(bool c)
 {
     if (c == true) {
-        //
+        // Clear current plots
+        ui->widget_implot->clear_data();
+        ui->widget_phdplot->clear_data();
+        ui->widget_crplot->clear_data();
+        // Open interface and start timer
         m_eth_iface->open();
         m_replot_timer->start();
         qDebug() << "monitoring...";
     } else {
-        //
+        // close interface and stop timer
         m_eth_iface->close();
         m_replot_timer->stop();
     }

@@ -37,7 +37,7 @@ public slots:
     void clear_data(void);
 
     void vid_replot(void);
-    void run(bool);
+    //void run(bool);
 
 signals:
     void click_pos(const QString & message);
@@ -60,7 +60,7 @@ private:
     QComboBox *m_cm_selector;
     QComboBox *m_scaling_selector;
     // TODO: sync to mainwindow 1 Hz timer
-    QTimer *m_replot_timer;
+    //QTimer *m_replot_timer;
 
 
     uint8_t x_bit = 11;

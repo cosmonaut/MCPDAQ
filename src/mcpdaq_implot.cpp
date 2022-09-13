@@ -30,8 +30,8 @@ mcpdaq_implot::mcpdaq_implot(QWidget *parent) : QWidget(parent)
         m_scaling_selector->addItem(scalEnum.key(ii));
     }
 
-    m_replot_timer = new QTimer();
-    m_replot_timer->setInterval(1000);
+    //m_replot_timer = new QTimer();
+    //m_replot_timer->setInterval(1000);
 
     // CONFIGURE PLOT ITEMS
 
@@ -185,7 +185,8 @@ mcpdaq_implot::mcpdaq_implot(QWidget *parent) : QWidget(parent)
     connect(m_cm_selector, SIGNAL(currentIndexChanged(int)), this, SLOT(cm_update(int)));
     connect(m_scaling_selector, SIGNAL(currentIndexChanged(int)), this, SLOT(sc_update(int)));
 
-    connect(m_replot_timer, SIGNAL(timeout()), this, SLOT(vid_replot()));
+    // TODO: remove local replot timer, use mainwindow primary timer.
+    //connect(m_replot_timer, SIGNAL(timeout()), this, SLOT(vid_replot()));
 }
 
 // choose the form of the destructor.
@@ -456,13 +457,11 @@ void mcpdaq_implot::sc_update(int index)
 // https://www.qcustomplot.com/index.php/support/forum/1838
 void mcpdaq_implot::append_data(const QList<photon_t> &data)
 {
-    //
+    // iterate over photons
     QList<photon_t>::ConstIterator it = data.constBegin();
     for (; it != data.constEnd(); ++it) {
         const photon_t& photon = *it;
-        //qDebug() << photon.x;
         colorMap->data()->setCell(photon.x, photon.y, colorMap->data()->cell(photon.x, photon.y) + 1);
-        //colorMap->data()->setCell(photon.x, photon.y, 10.0);
     }
 }
 
@@ -492,11 +491,11 @@ void mcpdaq_implot::vid_replot()
     //qDebug();
 }
 
-void mcpdaq_implot::run(bool stat)
-{
-    if (stat == true) {
-        m_replot_timer->start();
-    } else {
-        m_replot_timer->stop();
-    }
-}
+//void mcpdaq_implot::run(bool stat)
+//{
+//    if (stat == true) {
+//        m_replot_timer->start();
+//    } else {
+//        m_replot_timer->stop();
+//    }
+//}

@@ -39,7 +39,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionMonitor, SIGNAL(triggered(bool)), this, SLOT(monitor(bool)));
 
     // plot connections
-    connect(ui->actionMonitor, SIGNAL(triggered(bool)), ui->widget_implot, SLOT(run(bool)));
+    //connect(ui->actionMonitor, SIGNAL(triggered(bool)), ui->widget_implot, SLOT(run(bool)));
 
     // Connect main 1 Hz timer to get count rate.
     connect(m_replot_timer, SIGNAL(timeout()), m_data, SLOT(update_cr()));
@@ -54,6 +54,8 @@ MainWindow::MainWindow(QWidget *parent)
     // phdplot
     connect(m_eth_iface, SIGNAL(valid_data(const QList<photon_t> &)), ui->widget_phdplot, SLOT(append_data(const QList<photon_t> &)));
 
+    // 1 Hz replot timer
+    connect(m_replot_timer, SIGNAL(timeout()), ui->widget_implot, SLOT(vid_replot()));
     connect(m_replot_timer, SIGNAL(timeout()), ui->widget_phdplot, SLOT(vid_replot()));
 }
 

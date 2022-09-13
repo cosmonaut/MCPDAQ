@@ -19,6 +19,9 @@ MCPDAQEtherDaqIface::MCPDAQEtherDaqIface(QObject *parent)
 
     m_udp_sock = new QUdpSocket(this);
 
+    // Initialize packet number tracker
+    last_pnum = -1;
+
     // connect UDP socket readyRead
     connect(m_udp_sock, &QUdpSocket::readyRead, this, &MCPDAQEtherDaqIface::rx);
 }
@@ -74,6 +77,19 @@ void MCPDAQEtherDaqIface::parse_pkt(QByteArray data)
 
     //qDebug() << nphot << " " << pnum;
 
+    if (data.size() != m_ec->pkt_len) {
+        qDebug() << "Packet length mismatch";
+        qDebug() << "Configured: " << m_ec->pkt_len << " Received: " << data.size();
+    }
+
+    // Track packet numbers for slips
+    last_pnum += 1;
+    if (pnum != last_pnum) {
+        last_pnum = pnum;
+        ++pkt_slips;
+        qDebug() << "packet slip " << pkt_slips;
+    }
+
     if (nphot > 244) {
         nphot = 244;
     }
@@ -86,10 +102,6 @@ void MCPDAQEtherDaqIface::parse_pkt(QByteArray data)
     // Photon list.
     QList<photon_t> pdat(nphot);
 
-//    for (int i = 0; i < plen; i++) {
-//        qDebug() << i << Qt::hex <<  p[i];
-//    }
-
     for (int i = 0; i < nphot; i++) {
         pdat[i].x = p[i*3 + 3] & xmask;
         pdat[i].y = p[i*3 + 4] & ymask;
@@ -97,9 +109,4 @@ void MCPDAQEtherDaqIface::parse_pkt(QByteArray data)
     }
 
     emit valid_data(pdat);
-
-    //qDebug() << pdat;
-//    for (int i = 0; i < nphot; i++) {
-//        qDebug() << pdat[i].x;
-//    }
 }

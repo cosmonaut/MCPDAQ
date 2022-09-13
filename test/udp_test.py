@@ -45,9 +45,12 @@ def main(bits, pbits):
     pkt[0] = 242
     #pkt[0] = 1
 
-    pkt[1] = 0
+    #pkt[1] = 0
     pkt[2] = 0
     
+    # Packet number
+    pnum = 0
+    pkt[1] = pnum
     
     N = 1 << bits
     mask = 0xffff >> (16 - bits)
@@ -66,8 +69,11 @@ def main(bits, pbits):
 
             pkt[3 + i*3] = x & mask
             pkt[4 + i*3] = y & mask
-            pkt[5 + i*3] = p & pmask       
-    
+            pkt[5 + i*3] = p & pmask
+
+        pkt[1] = pnum;
+        pnum += 1
+        
         csock.sendto(pkt.tobytes(), (UDP_IP, UDP_PORT))
         time.sleep(0.001)
         end = time.time()

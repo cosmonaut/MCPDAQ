@@ -30,6 +30,8 @@ private slots:
 private:
     QUdpSocket *m_udp_sock;
     etherdaq_config_t *m_ec;
+    quint16 last_pnum;
+    quint32 pkt_slips;
 };
 
 #endif // MCPDAQETHERDAQIFACE_H

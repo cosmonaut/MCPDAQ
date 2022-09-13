@@ -136,6 +136,8 @@ mcpdaq_implot::mcpdaq_implot(QWidget *parent) : QWidget(parent)
     m_plot->yAxis->setRange(QCPRange(m_ymin, m_ymax));
     m_plot->xAxis->setScaleRatio(m_plot->yAxis, 1.0);
 
+    m_plot->axisRect()->setMinimumMargins(QMargins(0,0,0,0));
+
     //m_plot->rescaleAxes();
     m_plot->replot();
     //m_plot->setMinimumSize(QSize(500, 500));

@@ -17,6 +17,9 @@ MainWindow::MainWindow(QWidget *parent)
     // etherdaq interface
     m_eth_iface = new MCPDAQEtherDaqIface(this);
 
+    m_replot_timer = new QTimer(this);
+    m_replot_timer->setInterval(1000);
+
     // etherdaq configuration
 //    m_ec = new etherdaq_config_t();
 //    m_ec->addr = QHostAddress("192.168.1.5");
@@ -43,10 +46,14 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Etherdaq connections
 
-    // main data aggregator?
+    // main data aggregator
     connect(m_eth_iface, SIGNAL(valid_data(const QList<photon_t> &)), m_data, SLOT(append_data(const QList<photon_t> &)));
     // implot
     connect(m_eth_iface, SIGNAL(valid_data(const QList<photon_t> &)), ui->widget_implot, SLOT(append_data(const QList<photon_t> &)));
+    // phdplot
+    connect(m_eth_iface, SIGNAL(valid_data(const QList<photon_t> &)), ui->widget_phdplot, SLOT(append_data(const QList<photon_t> &)));
+
+    connect(m_replot_timer, SIGNAL(timeout()), ui->widget_phdplot, SLOT(vid_replot()));
 }
 
 MainWindow::~MainWindow()
@@ -70,9 +77,11 @@ void MainWindow::monitor(bool c)
     if (c == true) {
         //
         m_eth_iface->open();
+        m_replot_timer->start();
         qDebug() << "monitoring...";
     } else {
         //
         m_eth_iface->close();
+        m_replot_timer->stop();
     }
 }

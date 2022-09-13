@@ -31,6 +31,8 @@ private:
     //etherdaq_config_t *m_ec;
     MCPDAQEtherDaqIface *m_eth_iface;
     mcpdaq_data *m_data;
+
+    QTimer *m_replot_timer;
 };
 
 #endif // MAINWINDOW_H

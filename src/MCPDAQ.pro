@@ -18,6 +18,7 @@ SOURCES += \
     mcpdaq_countplot.cpp \
     mcpdaq_data.cpp \
     mcpdaq_implot.cpp \
+    mcpdaq_phdplot.cpp \
     mcpdaqetherdaqdialog.cpp \
     mcpdaqetherdaqiface.cpp \
     qcustomplot.cpp
@@ -28,6 +29,7 @@ HEADERS += \
     mcpdaq_countplot.h \
     mcpdaq_data.h \
     mcpdaq_implot.h \
+    mcpdaq_phdplot.h \
     mcpdaq_types.h \
     mcpdaqetherdaqdialog.h \
     mcpdaqetherdaqiface.h \

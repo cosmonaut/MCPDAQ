@@ -91,9 +91,9 @@ void MCPDAQEtherDaqIface::parse_pkt(QByteArray data)
 //    }
 
     for (int i = 0; i < nphot; i++) {
-        pdat[i].x = p[i + 3] & xmask;
-        pdat[i].y = p[i + 4] & ymask;
-        pdat[i].p = p[i + 5] & pmask;
+        pdat[i].x = p[i*3 + 3] & xmask;
+        pdat[i].y = p[i*3 + 4] & ymask;
+        pdat[i].p = p[i*3 + 5] & pmask;
     }
 
     emit valid_data(pdat);

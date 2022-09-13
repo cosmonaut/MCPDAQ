@@ -51,24 +51,22 @@ def main(bits, pbits):
     
     N = 1 << bits
     mask = 0xffff >> (16 - bits)
-    sig = N/100
+    sig = N/50
     
     NP = 1 << pbits
     pmask = 0xffff >> (16 - pbits)
-    psig = NP/50
-    
+    psig = NP/12.8
     
     for i in range(1000):
         start = time.time()
         for i in range(242):
-            x = abs(int(np.random.normal()*sig + N//2))
-            y = abs(int(np.random.normal()*sig + N//2))
-            p = abs(int(np.random.normal()*5 + 128))
+            x = abs(int(np.random.normal(N//2, sig)))
+            y = abs(int(np.random.normal(N//2, sig)))
+            p = abs(int(np.random.normal(NP//2, psig)))
 
-            pkt[3 + i] = x & mask
-            pkt[4 + i] = y & mask
-            pkt[5 + i] = p & pmask
-        
+            pkt[3 + i*3] = x & mask
+            pkt[4 + i*3] = y & mask
+            pkt[5 + i*3] = p & pmask       
     
         csock.sendto(pkt.tobytes(), (UDP_IP, UDP_PORT))
         time.sleep(0.001)

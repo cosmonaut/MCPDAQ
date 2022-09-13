@@ -8,14 +8,14 @@ mcpdaq_implot::mcpdaq_implot(QWidget *parent) : QWidget(parent)
     QHBoxLayout *hbox = new QHBoxLayout();
 
     // refresh rate spinbox
-    m_refresh_rate_spinbox = new QDoubleSpinBox(this);
-    m_refresh_rate_spinbox->setDecimals(1);
-    m_refresh_rate_spinbox->setValue(1.0);
-    m_refresh_rate_spinbox->setRange(0.1, 60.0);
-    m_refresh_rate_spinbox->setSingleStep(1.0);
+//    m_refresh_rate_spinbox = new QDoubleSpinBox(this);
+//    m_refresh_rate_spinbox->setDecimals(1);
+//    m_refresh_rate_spinbox->setValue(1.0);
+//    m_refresh_rate_spinbox->setRange(0.1, 60.0);
+//    m_refresh_rate_spinbox->setSingleStep(1.0);
 
     // rebin combo box
-    m_rebin_selector = new QComboBox(this);
+    //m_rebin_selector = new QComboBox(this);
     m_cm_selector = new QComboBox(this);
     m_scaling_selector = new QComboBox(this);
 
@@ -149,15 +149,15 @@ mcpdaq_implot::mcpdaq_implot(QWidget *parent) : QWidget(parent)
     //this->setSizePolicy( p );
     //m_plot->setSizePolicy( p );
 
-    QLabel *sp_label = new QLabel("Refresh Rate");
-    QLabel *rb_label = new QLabel("Rebin");
+    //QLabel *sp_label = new QLabel("Refresh Rate");
+    //QLabel *rb_label = new QLabel("Rebin");
     QLabel *cm_label = new QLabel("Color Map");
     QLabel *sc_label = new QLabel("Scaling");
 
-    hbox->addWidget(sp_label);
-    hbox->addWidget(m_refresh_rate_spinbox);
-    hbox->addWidget(rb_label);
-    hbox->addWidget(m_rebin_selector);
+    //hbox->addWidget(sp_label);
+    //hbox->addWidget(m_refresh_rate_spinbox);
+    //hbox->addWidget(rb_label);
+    //hbox->addWidget(m_rebin_selector);
     hbox->addWidget(cm_label);
     hbox->addWidget(m_cm_selector);
     hbox->addWidget(sc_label);

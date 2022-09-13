@@ -39,6 +39,8 @@ public slots:
     void vid_replot(void);
     //void run(bool);
 
+    //void update_config();
+
 signals:
     void click_pos(const QString & message);
 
@@ -55,8 +57,8 @@ private:
 
     // controls
     // This spinbox should probably become a combo box for "persistance"
-    QDoubleSpinBox *m_refresh_rate_spinbox;
-    QComboBox *m_rebin_selector;
+    //QDoubleSpinBox *m_refresh_rate_spinbox;
+    //QComboBox *m_rebin_selector;
     QComboBox *m_cm_selector;
     QComboBox *m_scaling_selector;
     // TODO: sync to mainwindow 1 Hz timer
